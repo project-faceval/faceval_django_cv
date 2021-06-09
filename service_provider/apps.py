@@ -11,7 +11,7 @@ ZONES = {
 ZONE = "defaultZone"
 # ZONE = "nanjing-1"
 
-SERVICE_NAME = 'FV_CV_SERVICE'
+SERVICE_NAME = 'fv-cv-service'
 
 
 def get_ip() -> str:
