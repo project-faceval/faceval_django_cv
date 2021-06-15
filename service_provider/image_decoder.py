@@ -17,8 +17,11 @@ def decode_base64(base64_str: str):
     return cv.imdecode(np.frombuffer(base64.b64decode(base64_str), dtype=np.uint8), flags=cv.IMREAD_COLOR)
 
 
-def decode_binary(binary_img, ext):
+def decode_binary(binary_img, ext, use_base64: bool):
     file_path = tmp_root / f"{get_uuid()}.{ext}"
+
+    if use_base64:
+        return decode_base64(binary_img)
 
     if not tmp_root.exists():
         os.makedirs(tmp_root)

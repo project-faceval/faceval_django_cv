@@ -6,7 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .image_decoder import decode_base64, decode_binary
 from .rest.handlers import RestRequestHandler
 from .cv.face_detect import detect
-from .forms import UploadFileForm
+from .forms import UploadFileForm, UploadFileFormBase64
 
 
 def detect_faces(img, detector='face', pick_count=None, pick_method="first"):
@@ -35,11 +35,18 @@ def detect_faces(img, detector='face', pick_count=None, pick_method="first"):
 class ImageDetectViewSet(RestRequestHandler):
 
     def post(self, request, *args, **kwargs):
-        form = UploadFileForm(request.POST, request.FILES)
+        use_base64 = request.POST.get('use_base64')
+        if use_base64 is not None and use_base64 == 'yes':
+            form = UploadFileFormBase64(request.POST)
+            use_base64 = True
+        else:
+            form = UploadFileForm(request.POST, request.FILES)
+            use_base64 = False
+
         if not form.is_valid():
             return HttpResponse(status=http.client.BAD_REQUEST)
 
-        img = decode_binary(form.cleaned_data['bimg'], form.cleaned_data['ext'])
+        img = decode_binary(form.cleaned_data['bimg'], form.cleaned_data['ext'], use_base64)
 
         faces = [*detect_faces(img, 'face')]
         face_count = len(faces)
